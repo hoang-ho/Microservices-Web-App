@@ -59,7 +59,7 @@ $ curl --header "Content-Type: application/json" --request GET  --data '{"title"
 ```
 
 ```
-$ curl --header "Content-Type: application/json" --request GET  --data '{"title":"How to get a good grade in 677 in 20 minutes a day."}' http://localhost:5002/catalog
+$ curl --header "Content-Type: application/json" --request GET  --data '{"id": 1}' http://localhost:5002/catalog
 {
   "Books": [
     {
@@ -79,7 +79,7 @@ In python
 >>> r = requests.get("http://localhost:5002/catalog", json={"topic":"distributed systems"}) 
 >>> r.text
 '{\n  "Books": [\n    {\n      "id": 1, \n      "stock": 3, \n      "title": "How to get a good grade in 677 in 20 minutes a day.", \n      "topic": "distributed systems"\n    }, \n    {\n      "id": 2, \n      "stock": 3, \n      "title": "RPCs for Dummies.", \n      "topic": "distributed systems"\n    }\n  ]\n}\n'
->>> r = requests.get("http://localhost:5002/catalog", json={"title":"How to get a good grade in 677 in 20 minutes a day."}) 
+>>> r = requests.get("http://localhost:5002/catalog", json={"id": 1}) 
 >>> r.text
 '{\n  "Books": [\n    {\n      "id": 1, \n      "stock": 3, \n      "title": "How to get a good grade in 677 in 20 minutes a day.", \n      "topic": "distributed systems"\n    }\n  ]\n}\n'
 ```

@@ -33,8 +33,8 @@ class CatalogService(Resource):
         request_data = request.get_json()
         app.logger.info("Receive a query request ")
         if (request_data):
-            if ("title" in request_data):
-                books = session.query(Book).filter_by(title=request_data["title"]).all()
+            if ("id" in request_data):
+                books = session.query(Book).filter_by(id=request_data["id"]).all()
                 response = jsonify(Books=[book.serialize for book in books])
                 response.status_code = 200
                 return response
@@ -52,7 +52,6 @@ class CatalogService(Resource):
     def put(self):
         app.logger.info("Receive a update request")
         data = request.get_json()
-        app.logger.info("Receive a query request " + str(data))
         if ("id" in data and "amount" in data):
             book = session.query(Book).filter_by(id=data["id"]).one()
             book.stock += data["amount"]
