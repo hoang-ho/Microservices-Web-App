@@ -19,14 +19,14 @@ def init_database():
 @app.route('/hello')
 def hello_google():
     #r= requests.get("http://localhost:5002/catalog", json={"id": 1})
-    #r = requests.get("http://localhost:5002/catalog", json={"id": 1})
-    r = requests.put("http://localhost:5002/catalog", json={"id": 1, "amount": -1})
+    r = requests.get("http://catalog-service:5002/catalog", json={"id": 1})
+    # r = requests.put("http://localhost:5002/catalog", json={"id": 1, "amount": -1})
 
-    quantity = r['Books'][0]['stock']
+    quantity = r.json()['Books'][0]['stock']
     print(quantity)
     if quantity > 0:
         print('Quantity')
-        r = requests.put("http://localhost:5002/catalog", json={"id": id, "amount": -1})
+        r = requests.put("http://catalog-service:5002/catalog", json={"id": 1, "amount": -1})
         print(r)
     #r = requests.get('http://www.google.com')
 

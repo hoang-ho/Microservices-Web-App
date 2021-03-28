@@ -1,5 +1,14 @@
 # Multi-tier Microservices WebApp
 
-Code for each microservice is in the corresponding folder.
+To deploy locally, git clone the repo
 
-TODO: Describe the overall flow of the application and how to run it
+```
+$ cd Microservices-web-app
+$ docker compose up
+```
+
+For your service to be built with docker compose, append your service in the docker-compose.yml, specify the container_name, build and port
+
+To call the catalog service, use "http://catalog-service:5002/catalog". Use the container_name as the host!
+
+Code for each microservice is in the corresponding folder.
