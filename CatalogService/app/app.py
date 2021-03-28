@@ -31,7 +31,7 @@ class CatalogService(Resource):
     def get(self):
         books = []
         request_data = request.get_json()
-        app.logger.info("Receive a query request ")
+        app.logger.info("Receive a query request ", request_data)
         if (request_data):
             if ("id" in request_data):
                 books = session.query(Book).filter_by(id=request_data["id"]).all()

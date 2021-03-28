@@ -1,12 +1,15 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  catalog-service:
-    container_name: catalog-service
-    build: ./CatalogService
+     
+  front-end-service:
+    container_name: front-end-service
+    build: 
+      context: ./FrontendService
+      dockerfile: deployments/app/Dockerfile
     ports:
-    - "5002:5002"
-  
+      - "5004:5004"
+
   order-service:
     container_name: order-service
     build: 
@@ -14,3 +17,11 @@ services:
       dockerfile: deployments/app/Dockerfile
     ports:
     - "5007:5007"
+
+  catalog-service:
+    container_name: catalog-service
+    build: 
+      context: ./CatalogService
+      dockerfile: deployments/app/Dockerfile
+    ports:
+      - "5002:5002"

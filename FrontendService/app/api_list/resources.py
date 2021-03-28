@@ -1,5 +1,6 @@
 from flask_restful import Resource
 
+import requests
 
 class Search(Resource):
     def get(self, topic_name=None):
@@ -10,12 +11,15 @@ class Search(Resource):
                 'topic_name': 'include description'
             }
 
-        # else call the catalog server
-
-        return {
-            'component': 'Search',
-            'topicName': topic_name
-        }
+        if(topic_name == 'distributed-systems'):
+            data = {"topic": "distributed systems"}
+        elif(topic_name == 'graduate-school'):
+           data = {"topic": "graduate school"}
+        else:
+            return {"message": "topic name should be in [distributed-systems, graduate-school"}, 400     
+        
+        response = requests.get('http://catalog-service:5002/catalog', json=data)
+        return response.json()
 
 
 class LookUp(Resource):
@@ -27,12 +31,10 @@ class LookUp(Resource):
                 'item_id': 'include description'
             }
 
-        # else call the catalog server
+        data = {"id": item_id}
 
-        return {
-            'component': 'LookUp',
-            'item_id': item_id
-        }
+        response = requests.get('http://catalog-service:5002/catalog', json=data)
+        return response.json()
 
 
 class Buy(Resource):
@@ -44,9 +46,7 @@ class Buy(Resource):
                 'topic_name': 'include description'
             }
 
-        # else call the order server
-        
-        return {
-            'component': 'Buy',
-            'item_id': item_id    
-        }
+        data = {"id": item_id}
+
+        response = requests.post('http://order-service:5007/catalog', json=data)
+        return response.json()
