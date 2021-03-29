@@ -19,7 +19,7 @@ $ docker run -p 5002:5002 catalog_service
 In terminal:
 
 ```
-$ curl --header "Content-Type: application/json" --request GET  --data '{"topic":"distributed systems"}' http://localhost:5002/catalog
+$ curl --header "Content-Type: application/json" --request GET  --data '{"topic":"distributed systems"}' http://localhost:5002/query
 {
   "Books": [
     {
@@ -39,7 +39,7 @@ $ curl --header "Content-Type: application/json" --request GET  --data '{"topic"
 ```
 
 ```
-$ curl --header "Content-Type: application/json" --request GET  --data '{"title":"graduate school"}' http://localhost:5002/catalog
+$ curl --header "Content-Type: application/json" --request GET  --data '{"title":"graduate school"}' http://localhost:5002/query
 {
   "Books": [
     {
@@ -59,7 +59,7 @@ $ curl --header "Content-Type: application/json" --request GET  --data '{"title"
 ```
 
 ```
-$ curl --header "Content-Type: application/json" --request GET  --data '{"id": 1}' http://localhost:5002/catalog
+$ curl --header "Content-Type: application/json" --request GET  --data '{"id": 1}' http://localhost:5002/query
 {
   "Books": [
     {
@@ -76,10 +76,10 @@ In python
 
 ```python
 >>> import requests
->>> r = requests.get("http://localhost:5002/catalog", json={"topic":"distributed systems"}) 
+>>> r = requests.get("http://localhost:5002/query", json={"topic":"distributed systems"}) 
 >>> r.text
 '{\n  "Books": [\n    {\n      "id": 1, \n      "stock": 3, \n      "title": "How to get a good grade in 677 in 20 minutes a day.", \n      "topic": "distributed systems"\n    }, \n    {\n      "id": 2, \n      "stock": 3, \n      "title": "RPCs for Dummies.", \n      "topic": "distributed systems"\n    }\n  ]\n}\n'
->>> r = requests.get("http://localhost:5002/catalog", json={"id": 1}) 
+>>> r = requests.get("http://localhost:5002/query", json={"id": 1}) 
 >>> r.text
 '{\n  "Books": [\n    {\n      "id": 1, \n      "stock": 3, \n      "title": "How to get a good grade in 677 in 20 minutes a day.", \n      "topic": "distributed systems"\n    }\n  ]\n}\n'
 ```
@@ -91,7 +91,7 @@ Here, I assume that we use the book id above to buy. However, we can discuss abo
 In terminal, 
 
 ```
-$ curl --header "Content-Type: application/json" --request PUT  --data '{"id": 1}' http://localhost:5002/catalog
+$ curl --header "Content-Type: application/json" --request PUT  --data '{"id": 1}' http://localhost:5002/update
 {
   "success": true
 }
@@ -100,7 +100,7 @@ $ curl --header "Content-Type: application/json" --request PUT  --data '{"id": 1
 In python,
 
 ```python
->>> r = requests.put("http://localhost:5002/catalog", json={"id": 1}) 
+>>> r = requests.put("http://localhost:5002/update", json={"id": 1}) 
 >>> r.text
 '{\n  "success": true\n}\n'
 ```

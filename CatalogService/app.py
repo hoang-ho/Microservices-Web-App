@@ -17,39 +17,47 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+
 def log_request(newData, key):
-    f = open ('logfile.json', "r")
-    data = json.loads(f.read())
+    fd = open('logfile.json', "r+")
+    data = json.loads(fd.read())
     data[key].append(newData)
-    fw = open('logfile.json', 'w')
-    json.dump(data, fw)
+    fd.seek(0)
+    json.dump(data, fd)
+    fd.truncate()
+    fd.close()
+
 
 @app.before_first_request
 def prepopulate():
     app.logger.info("Prepopulate data")
-    f = open ('logfile.json', "r")
-    data = json.loads(f.read())
+    if (session.query(Book).first() is None):
+        f = open('logfile.json', "r")
+        data = json.loads(f.read())
 
-    # add all the book
-    for book in data["add"]:
-        session.add(Book(title=book["title"], topic=book["topic"], stock=book["stock"], cost=book["cost"]))
-    
-    session.commit()
-    
-    # update
-    for book in data["update"]:
-        session.query(Book).filter_by(id=book["id"]).update({"stock": book["stock"]})
-    session.commit()
+        # add all the book
+        for book in data["add"]:
+            session.add(Book(
+                title=book["title"], topic=book["topic"], stock=book["stock"], cost=book["cost"]))
+        session.commit()
 
-class CatalogService(Resource):
+        # update
+        for book in data["update"]:
+            session.query(Book).filter_by(
+                id=book["id"]).update({"stock": book["stock"]})
+        session.commit()
+
+
+class Query(Resource):
     def get(self):
         books = []
         request_data = request.get_json()
         app.logger.info("Receive a query request ")
         if (request_data):
-            
+
             if ("id" in request_data):
-                books = session.query(Book).filter_by(id=request_data["id"]).all()
+                books = session.query(Book).filter_by(
+                    id=request_data["id"]).all()
                 logRequest = {"id": request_data["id"]}
                 log_request(logRequest, "get")
                 response = jsonify(Books=[book.serialize for book in books])
@@ -57,7 +65,8 @@ class CatalogService(Resource):
                 return response
 
             elif ("topic" in request_data):
-                books = session.query(Book).filter_by(topic=request_data["topic"]).all()
+                books = session.query(Book).filter_by(
+                    topic=request_data["topic"]).all()
                 logRequest = {"topic": request_data["topic"]}
                 log_request(logRequest, "get")
                 response = jsonify(Books=[book.serialize for book in books])
@@ -67,7 +76,9 @@ class CatalogService(Resource):
             response = jsonify(success=False)
             response.status_code = 400
             return response
-    
+
+
+class Buy(Resource):
     def put(self):
         app.logger.info("Receive a update request")
         data = request.get_json()
@@ -84,7 +95,9 @@ class CatalogService(Resource):
             response.status_code = 400
             return response
 
-api.add_resource(CatalogService, "/catalog")
+
+api.add_resource(Query, "/query")
+api.add_resource(Buy, "/update")
 
 if __name__ == "__main__":
     # run the application

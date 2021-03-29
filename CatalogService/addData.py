@@ -1,10 +1,43 @@
-def add_data():
-    with open("logfile.txt", "w") as fd:
-        fd.write("add" + "\t" + "1" + "\t" + "How to get a good grade in 677 in 20 minutes a day." + "\t" + "distributed systems" + "\t" + "1000" + "\t" + "1" + "\n")
-        fd.write("add" + "\t" + "2" + "\t" + "RPCs for Dummies." + "\t" + "distributed systems" + "\t" + "1000" + "\t" + "10" + "\n")
-        fd.write("add" + "\t" + "3" + "\t" + "Xen and the Art of Surviving Graduate School." + "\t" + "graduate school" + "\t" + "1000" + "\t" + "100" + "\n")
-        fd.write("add" + "\t" + "4" + "\t" + "Cooking for the Impatient Graduate Student." + "\t" + "graduate school" + "\t" + "1000" + "\t" "1000" + "\n")
+import json 
 
+def add_data():
+    data = {}
+    data["add"] = [{
+            "id": 1,
+            "title": "How to get a good grade in 677 in 20 minutes a day.",
+            "topic": "distributed systems",
+            "stock": 1000,
+            "cost": 1
+        },
+        {
+            "id": 2,
+            "title": "RPCs for Dummies.",
+            "topic": "distributed systems",
+            "stock": 1000,
+            "cost": 10
+        },
+        {
+            "id": 3,
+            "title": "Xen and the Art of Surviving Graduate School.",
+            "topic": "graduate school",
+            "stock": 1000,
+            "cost": 100
+        },
+        {
+            "id": 4,
+            "title": "Cooking for the Impatient Graduate Student.",
+            "topic": "graduate school",
+            "stock": 1000,
+            "cost": 1000
+        }]
+
+    data["update"] = []
+    data["get"] = []
+
+    fw = open("logfile.json", "w") 
+    json.dump(data, fw)
+    fw.close()
+        
 
 if __name__ == "__main__":
     add_data()
