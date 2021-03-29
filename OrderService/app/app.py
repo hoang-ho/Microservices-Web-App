@@ -2,89 +2,79 @@
 
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
+import json
 import requests
 app = Flask(__name__)
 api = Api(app)
 import sqlite3 as sql
+from datetime import datetime
 
-
+@app.before_first_request
 def init_database():
-    print('Creating database')
     conn = sql.connect('database.db')
-    # print "Opened database successfully";
-    conn.execute('CREATE TABLE IF NOT EXISTS students (name TEXT, addr TEXT, city TEXT, pin TEXT)')
+    conn.execute('CREATE TABLE IF NOT EXISTS buy_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, request_id INTEGER NOT NULL, timestamp TEXT NOT NULL)')
     conn.close()
 
-    # print "Table created successfully";
-@app.route('/hello')
-def hello_google():
-    #r= requests.get("http://localhost:5002/catalog", json={"id": 1})
-    r = requests.get("http://catalog-service:5002/catalog", json={"id": 1})
-    # r = requests.put("http://localhost:5002/catalog", json={"id": 1, "amount": -1})
 
-    quantity = r.json()['Books'][0]['stock']
-    print(quantity)
-    if quantity > 0:
-        print('Quantity')
-        r = requests.put("http://catalog-service:5002/catalog", json={"id": 1, "amount": -1})
-        print(r)
-    #r = requests.get('http://www.google.com')
-
-    return "Hello"
-
-@app.route("/")
-def hello():
-    conn = sql.connect('database.db')
-    # print "Opened database successfully";
-    conn.execute('CREATE TABLE IF NOT EXISTS students (name TEXT, addr TEXT, city TEXT, pin TEXT)')
-    # print "Table created successfully";
-    with sql.connect("database.db") as conn:
-        cur = conn.cursor()
-        cur.execute("INSERT INTO students (name,addr,city,pin) VALUES(?, ?, ?, ?)", ('app', 'b', 'c', 'd'))
-
-        conn.commit()
-        msg = "Record successfully added"
-    con = sql.connect("database.db")
-    con.row_factory = sql.Row
-
-    cur = con.cursor()
-    cur.execute("select * from students")
-
-    rows = cur.fetchall();
-    for row in rows:
-        print(row["name"], row["addr"], row["city"], row['pin'])
-    #conn.close()
-    #r = requests.put("http://localhost:5002/catalog", json={"id": 1, "amount": -1})
-    #return str(r)
-    return str(len(rows))
-
-# @app.route("/buy")
-# def buy_fun():
-#      return render_template('index.html')
-
-# @app.route('/parse', methods=['POST'])
-# def parse():
-#     if request.method == 'POST':
-#         try:
-#             id = request.form['id']
-#             return str(len(id))
+class LogService(Resource):
+    def get(self):
+        with sql.connect("database.db") as conn:
+            conn.row_factory = sql.Row
+            cur = conn.cursor()
+            cur.execute("select * from buy_logs")
+            rows = cur.fetchall()
+            row_list=[]
+            for row in rows:
+                row_list.append({'id':row['id'],'request_id':row['request_id'],'timestamp':row['timestamp']})
+        if rows:
+            result=json.dumps(row_list)
+        else:
+            result=json.dumps( {'message': 'Log is empty'})
+        return result
 
 class OrderService(Resource):
 
-    def get(self):
-        request_data = request.get_json()
-
-        return request_data
-
     def put(self):
         request_data = request.get_json()
+        id= request_data['id']
+        if not id:
+            return json.dumps({'message':"Invalid request"})
 
-        return request_data
+        with sql.connect("database.db") as conn:
+             cur = conn.cursor()
+             time_stamp = str(datetime.now())
+             cur.execute("INSERT INTO buy_logs (request_id,timestamp) VALUES( ?, ?)",  (id,time_stamp ))
+             conn.commit()
+        response = requests.get("http://catalog-service:5002/catalog", json={"id": id})
+        response_json= response.json()
+        if response.status_code!=200:
+            return json.dumps({'message': "Error in receiving response from catalog service"})
+        if len(response_json['Books']) > 0:
+            quantity = response_json['Books'][0]['stock']
+        else:
+            return json.dumps({'message': "Invalid request id"})
+
+        if quantity > 0:
+            response = requests.put("http://catalog-service:5002/catalog", json={"id": id, "amount": -1})
+            if response.status_code== 200:
+                return json.dumps({'message': 'Buy request successful'})
+            else:
+                return json.dumps({'message': 'Buy request falied'})
+
+        #     # print(r)
+        # # r = requests.get('http://www.google.com')
+        else:
+            return json.dumps({'message': 'Item not available'})
+
+
+        return json.dumps({'message': 'Error while buying'})
+
+        #return request_data
 
 api.add_resource(OrderService, "/order")
+api.add_resource(LogService, "/log")
 
 
 if __name__ == '__main__':
-    init_database()
     app.run(debug=True, host='0.0.0.0',  port=5007)
 
