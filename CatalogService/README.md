@@ -1,4 +1,5 @@
 # Catalog service
+## API
 
 The service exposes two API calls: a GET request (query API) and a PUT request (update API).
 
@@ -97,10 +98,26 @@ $ curl --header "Content-Type: application/json" --request PUT  --data '{"id": 1
 }
 ```
 
-In python,g
+In python,
 
 ```python
 >>> r = requests.put("http://localhost:5002/catalog/update", json={"id": 1}) 
 >>> r.text
 '{\n  "success": true\n}\n'
 ```
+
+## Logging
+
+Logging happens in logfile.json inside the Docker container catalog-service, to check if the logging is there:
+
+```
+$ docker exec -it catalog-service bash 
+```
+
+Inside the container, check the logfile.json:
+
+```
+$ cat logfile.json
+```
+
+A buy request will be logged in the "buy" key of the json object. A query request will be logged in the "query" key of the json object. 

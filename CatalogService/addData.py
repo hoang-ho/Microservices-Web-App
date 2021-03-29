@@ -31,8 +31,8 @@ def add_data():
             "cost": 1000
         }]
 
-    data["update"] = []
-    data["get"] = []
+    data["buy"] = []
+    data["query"] = []
 
     fw = open("logfile.json", "w") 
     json.dump(data, fw)

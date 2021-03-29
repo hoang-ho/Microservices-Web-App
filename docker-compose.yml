@@ -4,18 +4,23 @@ services:
   catalog-service:
     container_name: catalog-service
     build: ./CatalogService
-    ports:
-    - "5002:5002"
-    volumes:
-    - type: bind
-      source: ./CatalogService
-      target: /CatalogService
+    # comment out because we don't want to expose this service to the outside world.
+    # APIs are served using front-end-service
+    # ports:
+    # - "5002:5002"
+    # To mount a local file to container 
+    # volumes:
+    # - type: bind
+    #   source: ./CatalogService/logfile.json
+    #   target: /CatalogService/logfile.json
   
   order-service:
     container_name: order-service
     build: 
       context: ./OrderService
       dockerfile: deployments/Dockerfile
+    # comment out because we don't want to expose this service to the outside world.
+    # APIs are served using front-end-service
     ports:
     - "5007:5007"
 

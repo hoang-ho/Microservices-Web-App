@@ -43,7 +43,7 @@ def prepopulate():
         session.commit()
 
         # update
-        for book in data["update"]:
+        for book in data["buy"]:
             session.query(Book).filter_by(
                 id=book["id"]).update({"stock": book["stock"]})
         session.commit()
@@ -61,7 +61,7 @@ class Query(Resource):
                     id=request_data["id"]).all()
                 logRequest = {
                     "id": request_data["id"], "timestamp": time.time()}
-                log_request(logRequest, "get")
+                log_request(logRequest, "query")
                 response = jsonify(Books=[book.serialize for book in books])
                 response.status_code = 200
                 return response
@@ -71,7 +71,7 @@ class Query(Resource):
                     topic=request_data["topic"]).all()
                 logRequest = {
                     "topic": request_data["topic"], "timestamp": time.time()}
-                log_request(logRequest, "get")
+                log_request(logRequest, "query")
                 response = jsonify(Books=[book.serialize for book in books])
                 response.status_code = 200
                 return response
@@ -83,14 +83,14 @@ class Query(Resource):
 
 class Buy(Resource):
     def put(self):
-        app.logger.info("Receive a update request")
+        app.logger.info("Receive a buy request")
         data = request.get_json()
         if ("id" in data):
             book = session.query(Book).filter_by(id=data["id"]).one()
             book.stock -= 1
             logRequest = {"id": book.id, "stock": book.stock,
                           "timestamp": time.time()}
-            log_request(logRequest, "update")
+            log_request(logRequest, "buy")
             response = jsonify(success=True)
             response.status_code = 200
             return response
