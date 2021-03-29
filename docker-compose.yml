@@ -11,6 +11,14 @@ services:
     container_name: order-service
     build: 
       context: ./OrderService
-      dockerfile: deployments/app/Dockerfile
+      dockerfile: deployments/Dockerfile
     ports:
     - "5007:5007"
+
+  front-end-service:
+    container_name: front-end-service
+    build: 
+      context: ./FrontendService
+      dockerfile: deployments/Dockerfile
+    ports:
+      - "5004:5004"

@@ -45,7 +45,7 @@ class OrderService(Resource):
              time_stamp = str(datetime.now())
              cur.execute("INSERT INTO buy_logs (request_id,timestamp) VALUES( ?, ?)",  (id,time_stamp ))
              conn.commit()
-        response = requests.get("http://catalog-service:5002/catalog", json={"id": id})
+        response = requests.get("http://catalog-service:5002/catalog/query", json={"id": id})
         response_json= response.json()
         if response.status_code!=200:
             return json.dumps({'message': "Error in receiving response from catalog service"})
@@ -55,7 +55,7 @@ class OrderService(Resource):
             return json.dumps({'message': "Invalid request id"})
 
         if quantity > 0:
-            response = requests.put("http://catalog-service:5002/catalog", json={"id": id, "amount": -1})
+            response = requests.put("http://catalog-service:5002/catalog/update", json={"id": id, "amount": -1})
             if response.status_code== 200:
                 return json.dumps({'message': 'Buy request successful'})
             else:
