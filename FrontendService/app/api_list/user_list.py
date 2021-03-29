@@ -5,7 +5,7 @@ class UserList(Resource):
     api_list = {
         'search': 'GET <address>:<port>/search/<topic_name>',
         'lookup': 'GET <address>:<port>/lookup/<item_id>',
-        'buy': 'POST <address>:<port>/buy <<< {item_id: 1}'
+        'buy': 'POST <address>:<port>/buy/<item_id>'
     }
 
     def get(self):
