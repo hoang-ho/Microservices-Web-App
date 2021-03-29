@@ -2,7 +2,7 @@
 import sys
 
 # for creating the mapper code
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, Float, String
 
 # for configuration and class code
 from sqlalchemy.ext.declarative import declarative_base
@@ -24,6 +24,7 @@ class Book(Base):
     title = Column(String(250), nullable=False)
     topic = Column(String(250))
     stock = Column(Integer)
+    cost = Column(Float)
 
     @property
     def serialize(self):
@@ -32,6 +33,7 @@ class Book(Base):
             "title": self.title,
             "topic": self.topic,
             "stock": self.stock,
+            "cost": self.cost,
         }        
 
 # creates a create_engine instance at the bottom of the file

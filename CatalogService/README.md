@@ -91,7 +91,7 @@ Here, I assume that we use the book id above to buy. However, we can discuss abo
 In terminal, 
 
 ```
-$ curl --header "Content-Type: application/json" --request PUT  --data '{"id": 1, "amount": -1}' http://localhost:5002/catalog
+$ curl --header "Content-Type: application/json" --request PUT  --data '{"id": 1}' http://localhost:5002/catalog
 {
   "success": true
 }
@@ -100,7 +100,7 @@ $ curl --header "Content-Type: application/json" --request PUT  --data '{"id": 1
 In python,
 
 ```python
->>> r = requests.put("http://localhost:5002/catalog", json={"id": 1, "amount": -1}) 
+>>> r = requests.put("http://localhost:5002/catalog", json={"id": 1}) 
 >>> r.text
 '{\n  "success": true\n}\n'
 ```

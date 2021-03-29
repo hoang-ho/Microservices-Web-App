@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from database_setup import Base, Book
+import json
 
 app = Flask(__name__)
 api = Api(app)
@@ -16,15 +17,28 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+def log_request(newData, key):
+    f = open ('logfile.json', "r")
+    data = json.loads(f.read())
+    data[key].append(newData)
+    fw = open('logfile.json', 'w')
+    json.dump(data, fw)
+
 @app.before_first_request
 def prepopulate():
     app.logger.info("Prepopulate data")
-    session.add_all([
-        Book(title="How to get a good grade in 677 in 20 minutes a day.", topic="distributed systems", stock = 3),
-        Book(title="RPCs for Dummies.", topic="distributed systems", stock = 3),
-        Book(title="Xen and the Art of Surviving Graduate School.", topic="graduate school", stock = 3),
-        Book(title="Cooking for the Impatient Graduate Student.", topic="graduate school", stock = 3)
-    ])
+    f = open ('logfile.json', "r")
+    data = json.loads(f.read())
+
+    # add all the book
+    for book in data["add"]:
+        session.add(Book(title=book["title"], topic=book["topic"], stock=book["stock"], cost=book["cost"]))
+    
+    session.commit()
+    
+    # update
+    for book in data["update"]:
+        session.query(Book).filter_by(id=book["id"]).update({"stock": book["stock"]})
     session.commit()
 
 class CatalogService(Resource):
@@ -33,14 +47,19 @@ class CatalogService(Resource):
         request_data = request.get_json()
         app.logger.info("Receive a query request ")
         if (request_data):
+            
             if ("id" in request_data):
                 books = session.query(Book).filter_by(id=request_data["id"]).all()
+                logRequest = {"id": request_data["id"]}
+                log_request(logRequest, "get")
                 response = jsonify(Books=[book.serialize for book in books])
                 response.status_code = 200
                 return response
 
             elif ("topic" in request_data):
                 books = session.query(Book).filter_by(topic=request_data["topic"]).all()
+                logRequest = {"topic": request_data["topic"]}
+                log_request(logRequest, "get")
                 response = jsonify(Books=[book.serialize for book in books])
                 response.status_code = 200
                 return response
@@ -52,9 +71,11 @@ class CatalogService(Resource):
     def put(self):
         app.logger.info("Receive a update request")
         data = request.get_json()
-        if ("id" in data and "amount" in data):
+        if ("id" in data):
             book = session.query(Book).filter_by(id=data["id"]).one()
-            book.stock += data["amount"]
+            book.stock -= 1
+            logRequest = {"id": book.id, "stock": book.stock}
+            log_request(logRequest, "update")
             response = jsonify(success=True)
             response.status_code = 200
             return response
