@@ -6,6 +6,10 @@ services:
     build: ./CatalogService
     ports:
     - "5002:5002"
+    volumes:
+    - type: bind
+      source: ./CatalogService
+      target: /CatalogService
   
   order-service:
     container_name: order-service

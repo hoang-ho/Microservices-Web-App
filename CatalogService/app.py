@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from database_setup import Base, Book
 import json
+import time
 
 app = Flask(__name__)
 api = Api(app)
@@ -58,7 +59,8 @@ class Query(Resource):
             if ("id" in request_data):
                 books = session.query(Book).filter_by(
                     id=request_data["id"]).all()
-                logRequest = {"id": request_data["id"]}
+                logRequest = {
+                    "id": request_data["id"], "timestamp": time.time()}
                 log_request(logRequest, "get")
                 response = jsonify(Books=[book.serialize for book in books])
                 response.status_code = 200
@@ -67,7 +69,8 @@ class Query(Resource):
             elif ("topic" in request_data):
                 books = session.query(Book).filter_by(
                     topic=request_data["topic"]).all()
-                logRequest = {"topic": request_data["topic"]}
+                logRequest = {
+                    "topic": request_data["topic"], "timestamp": time.time()}
                 log_request(logRequest, "get")
                 response = jsonify(Books=[book.serialize for book in books])
                 response.status_code = 200
@@ -85,7 +88,8 @@ class Buy(Resource):
         if ("id" in data):
             book = session.query(Book).filter_by(id=data["id"]).one()
             book.stock -= 1
-            logRequest = {"id": book.id, "stock": book.stock}
+            logRequest = {"id": book.id, "stock": book.stock,
+                          "timestamp": time.time()}
             log_request(logRequest, "update")
             response = jsonify(success=True)
             response.status_code = 200
