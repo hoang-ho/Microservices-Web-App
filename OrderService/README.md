@@ -11,3 +11,6 @@ curl --header "Content-Type: application/json" --request PUT  --data '{"id": 3}'
 View logs
 curl --header "Content-Type: application/json" --request GET   http://localhost:5007/log
 
+Calling from docker
+requests.get("http://order-service:5007/order", json={"id": 1})
+
