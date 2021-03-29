@@ -96,8 +96,8 @@ class Buy(Resource):
             return response
 
 
-api.add_resource(Query, "/query")
-api.add_resource(Buy, "/update")
+api.add_resource(Query, "/catalog/query")
+api.add_resource(Buy, "/catalog/update")
 
 if __name__ == "__main__":
     # run the application
