@@ -21,8 +21,8 @@ services:
       dockerfile: deployments/Dockerfile
     # comment out because we don't want to expose this service to the outside world.
     # APIs are served using front-end-service
-    ports:
-    - "5007:5007"
+    #ports:
+    #- "5007:5007"
 
   front-end-service:
     container_name: front-end-service
