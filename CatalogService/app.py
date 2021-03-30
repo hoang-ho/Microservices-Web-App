@@ -74,7 +74,7 @@ class Query(Resource):
                     "topic": request_data["topic"], "timestamp": time.time()}
                 log_request(logRequest, "query")
                 response = jsonify(
-                    items=[book.serializeQueryByTopic for book in books])
+                    Books=[book.serializeQueryByTopic for book in books])
                 response.status_code = 200
                 return response
         else:

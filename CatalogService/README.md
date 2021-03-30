@@ -22,7 +22,7 @@ In terminal:
 ```
 $ curl --header "Content-Type: application/json" --request GET  --data '{"topic":"distributed systems"}' http://localhost:5002/catalog/query
 {
-    "items": [
+    "Books": [
         {
             "How to get a good grade in 677 in 20 minutes a day.": 1
         },
@@ -36,7 +36,7 @@ $ curl --header "Content-Type: application/json" --request GET  --data '{"topic"
 ```
 $ curl --header "Content-Type: application/json" --request GET  --data '{"title":"graduate school"}' http://localhost:5002/catalog/query
 {
-    "items": [
+    "Books": [
         {
             "Xen and the Art of Surviving Graduate School.": 3
         },
@@ -78,7 +78,7 @@ In python
 >>> r = requests.get("http://localhost:5002/catalog/query", json={"id": 1}) 
 >>> r.text
 '{
-    "items": [
+    "Books": [
         {
             "cost": 1.0,
             "stock": 1000
