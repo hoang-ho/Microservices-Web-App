@@ -5,17 +5,17 @@ This service exposes all the API endpoints that the users will be able to intera
 ## Endpoints Available
 
 1. **Search(topic):**
-> API Endpoint: GET http://localhost:5004/search/\<topic-name>
+> API Endpoint: GET http://localhost:5004/search/topic-name
 
 This allows the user to specify a topic and returns the name and the id of all entries belonging to that category. The topic is a string and available topics are: `distributed-systems` and `graduate-school`. This is turn calls the query functionality of catalog service.
 
 2. **Lookup(id):**
-> API Endpoint: GET http://localhost:5004/lookup/\<id>
+> API Endpoint: GET http://localhost:5004/lookup/book-id
 
-This allows an id to be specified and returns the number of items in stock and cost of the book with id=\<id>. The id is in the list: `1, 2, 3, and 4`. This is turn calls the query functionality of catalog service.
+This allows an id to be specified and returns the number of items in stock and cost of the book with id=book-id. The id is in the list: `1, 2, 3, and 4`. This is turn calls the query functionality of catalog service.
 
 3. **Buy(id):**
-> API Endpoint: POST http://localhost:5004/buy/\<id>
+> API Endpoint: POST http://localhost:5004/buy/book-id
 
 This specifies a book id for purchase. This in turn calls the order service.
 
