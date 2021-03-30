@@ -52,33 +52,25 @@ $ docker-compose up --build <service-name>
 ```
 $ curl --request GET http://localhost:5004/search/distributed-systems
 {
-    "Books": [
+    "items": [
         {
-            "id": 1,
-            "title": "How to get a good grade in 677 in 20 minutes a day.",
-            "topic": "distributed systems"
+            "How to get a good grade in 677 in 20 minutes a day.": 1
         },
         {
-            "id": 2,
-            "title": "RPCs for Dummies.",
-            "topic": "distributed systems"
+            "RPCs for Dummies.": 2
         }
     ]
 }
 ```
 ```
 $ curl --request GET http://localhost:5004/search/graduate-school 
-{
-    "Books": [
+
+    "items": [
         {
-            "id": 3,
-            "title": "Xen and the Art of Surviving Graduate School.",
-            "topic": "graduate school"
+            "Xen and the Art of Surviving Graduate School.": 3
         },
         {
-            "id": 4,
-            "title": "Cooking for the Impatient Graduate Student.",
-            "topic": "graduate school"
+            "Cooking for the Impatient Graduate Student.": 4
         }
     ]
 }
@@ -93,10 +85,7 @@ $ curl --request GET http://localhost:5004/lookup/1
     "Books": [
         {
             "cost": 1.0,
-            "id": 1,
-            "stock": 1000,
-            "title": "How to get a good grade in 677 in 20 minutes a day.",
-            "topic": "distributed systems"
+            "stock": 1000
         }
     ]
 }
@@ -107,7 +96,9 @@ $ curl --request GET http://localhost:5004/lookup/1
 
 ```
 $ curl --request POST http://localhost:5004/buy/2 
-"{\"message\": \"Buy request successful\"}"
+{
+    "message": "book bought successful"
+}
 ```
 
 ### Stopping and Removing the Containers
