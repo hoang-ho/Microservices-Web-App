@@ -39,7 +39,7 @@ Also, to run only a particular container run the following command:
 ```
 $ docker-compose up --build <service-name>
 ```
-> Note: The available services are: front-end-service, catalog-service, order-service
+> Note: The available services are: front-end-service, catalog-service, order-service.
 
 ### Available commands to run from the client
 **Prerequisites:** Please make sure the environment is runnning by following the above commands.
@@ -52,16 +52,12 @@ $ curl --request GET http://localhost:5004/search/distributed-systems
 {
     "Books": [
         {
-            "cost": 1.0,
             "id": 1,
-            "stock": 1000,
             "title": "How to get a good grade in 677 in 20 minutes a day.",
             "topic": "distributed systems"
         },
         {
-            "cost": 10.0,
             "id": 2,
-            "stock": 1000,
             "title": "RPCs for Dummies.",
             "topic": "distributed systems"
         }
@@ -73,16 +69,12 @@ $ curl --request GET http://localhost:5004/search/graduate-school
 {
     "Books": [
         {
-            "cost": 100.0,
             "id": 3,
-            "stock": 1000,
             "title": "Xen and the Art of Surviving Graduate School.",
             "topic": "graduate school"
         },
         {
-            "cost": 1000.0,
             "id": 4,
-            "stock": 1000,
             "title": "Cooking for the Impatient Graduate Student.",
             "topic": "graduate school"
         }
@@ -122,3 +114,22 @@ To stop and remove containers and images run the following command:
 ```
 $ docker-compose down -v --rmi all --remove-orphans
 ```
+
+### Test Script
+
+Run test.sh to test the APIs. The output of the test is in a newly created txt file, out.txt.
+### Logging for CatalogService
+
+Logging happens in logfile.json inside the Docker container catalog-service, to check if the logging is there:
+
+```
+$ docker exec -it catalog-service bash 
+```
+
+Inside the container, check the logfile.json:
+
+```
+$ cat logfile.json
+```
+
+A buy request will be logged in the "buy" key of the json object. A query request will be logged in the "query" key of the json object. 

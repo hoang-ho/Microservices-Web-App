@@ -22,54 +22,51 @@ In terminal:
 ```
 $ curl --header "Content-Type: application/json" --request GET  --data '{"topic":"distributed systems"}' http://localhost:5002/catalog/query
 {
-  "Books": [
-    {
-      "id": 1, 
-      "stock": 3, 
-      "title": "How to get a good grade in 677 in 20 minutes a day.", 
-      "topic": "distributed systems"
-    }, 
-    {
-      "id": 2, 
-      "stock": 3, 
-      "title": "RPCs for Dummies.", 
-      "topic": "distributed systems"
-    }
-  ]
+    "Books": [
+        {
+            "id": 1,
+            "title": "How to get a good grade in 677 in 20 minutes a day.",
+            "topic": "distributed systems"
+        },
+        {
+            "id": 2,
+            "title": "RPCs for Dummies.",
+            "topic": "distributed systems"
+        }
+    ]
 }
 ```
 
 ```
 $ curl --header "Content-Type: application/json" --request GET  --data '{"title":"graduate school"}' http://localhost:5002/catalog/query
 {
-  "Books": [
-    {
-      "id": 3, 
-      "stock": 3, 
-      "title": "Xen and the Art of Surviving Graduate School.", 
-      "topic": "graduate school"
-    }, 
-    {
-      "id": 4, 
-      "stock": 3, 
-      "title": "Cooking for the Impatient Graduate Student.", 
-      "topic": "graduate school"
-    }
-  ]
+    "Books": [
+        {
+            "id": 3,
+            "title": "Xen and the Art of Surviving Graduate School.",
+            "topic": "graduate school"
+        },
+        {
+            "id": 4,
+            "title": "Cooking for the Impatient Graduate Student.",
+            "topic": "graduate school"
+        }
+    ]
 }
 ```
 
 ```
 $ curl --header "Content-Type: application/json" --request GET  --data '{"id": 1}' http://localhost:5002/catalog/query
 {
-  "Books": [
-    {
-      "id": 1, 
-      "stock": 3, 
-      "title": "How to get a good grade in 677 in 20 minutes a day.", 
-      "topic": "distributed systems"
-    }
-  ]
+    "Books": [
+        {
+            "cost": 1.0,
+            "id": 1,
+            "stock": 1000,
+            "title": "How to get a good grade in 677 in 20 minutes a day.",
+            "topic": "distributed systems"
+        }
+    ]
 }
 ```
 
@@ -79,10 +76,10 @@ In python
 >>> import requests
 >>> r = requests.get("http://localhost:5002/catalog/query", json={"topic":"distributed systems"}) 
 >>> r.text
-'{\n  "Books": [\n    {\n      "id": 1, \n      "stock": 3, \n      "title": "How to get a good grade in 677 in 20 minutes a day.", \n      "topic": "distributed systems"\n    }, \n    {\n      "id": 2, \n      "stock": 3, \n      "title": "RPCs for Dummies.", \n      "topic": "distributed systems"\n    }\n  ]\n}\n'
+'{\n  "Books": [\n    {\n      "id": 1, \n     "title": "How to get a good grade in 677 in 20 minutes a day.", \n      "topic": "distributed systems"\n    }, \n    {\n      "id": 2, \n     "title": "RPCs for Dummies.", \n      "topic": "distributed systems"\n    }\n  ]\n}\n'
 >>> r = requests.get("http://localhost:5002/catalog/query", json={"id": 1}) 
 >>> r.text
-'{\n  "Books": [\n    {\n      "id": 1, \n      "stock": 3, \n      "title": "How to get a good grade in 677 in 20 minutes a day.", \n      "topic": "distributed systems"\n    }\n  ]\n}\n'
+'{\n  "Books": [\n    {\n      "id": 1, \n      "stock": 1000, \n      "title": "How to get a good grade in 677 in 20 minutes a day.", \n      "topic": "distributed systems"\n    "cost": 1.0 \n}\n  ]\n}\n'
 ```
 
 **Update request**:

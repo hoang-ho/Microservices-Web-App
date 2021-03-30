@@ -34,7 +34,15 @@ class Book(Base):
             "topic": self.topic,
             "stock": self.stock,
             "cost": self.cost,
-        }        
+        } 
+
+    @property
+    def partialSerialize(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "topic": self.topic,
+        }
 
 # creates a create_engine instance at the bottom of the file
 engine = create_engine('sqlite:///books-collection.db')
