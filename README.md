@@ -5,6 +5,8 @@ Programming Lab2 for the course CS 677: Distributed OS. In this lab we have to i
 
 **Deliverables:** A bookstore running on a single server with a single buyer. The bookstore components (front-end, catalogue and order) are deployed as three processes and a fourth process representing the client performing interface calls to the front-end process.
 
+**Assumption:** As per the documentation, the `search` operation returns only `id and topic` fields and the `lookup` operation returns only `cost and stock` fields.
+
 ### Overview 
 The following is a brief description of each microservice implemented.
 
@@ -45,7 +47,7 @@ $ docker-compose up --build <service-name>
 **Prerequisites:** Please make sure the environment is runnning by following the above commands.
 
 1. To search for books by topic:
-> API Endpoint: GET http://localhost:5004/search/\<topic-name>
+> API Endpoint: GET http://localhost:5004/search/topic-name
 
 ```
 $ curl --request GET http://localhost:5004/search/distributed-systems
@@ -83,7 +85,7 @@ $ curl --request GET http://localhost:5004/search/graduate-school
 ```
 
 2. To lookup books by id:
-> API Endpoint: GET http://localhost:5004/lookup/\<id>
+> API Endpoint: GET http://localhost:5004/lookup/book-id
 
 ```
 $ curl --request GET http://localhost:5004/lookup/1
@@ -101,7 +103,7 @@ $ curl --request GET http://localhost:5004/lookup/1
 ```
 
 3. To buy a book by id:
-> API Endpoint: POST http://localhost:5004/buy/\<id>
+> API Endpoint: POST http://localhost:5004/buy/book-id
 
 ```
 $ curl --request POST http://localhost:5004/buy/2 
@@ -116,8 +118,8 @@ $ docker-compose down -v --rmi all --remove-orphans
 ```
 
 ### Test Script
-
 Run test.sh to test the APIs. The output of the test is in a newly created txt file, out.txt.
+
 ### Logging for CatalogService
 
 Logging happens in logfile.json inside the Docker container catalog-service, to check if the logging is there:
