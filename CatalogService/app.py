@@ -62,7 +62,8 @@ class Query(Resource):
                 logRequest = {
                     "id": request_data["id"], "timestamp": time.time()}
                 log_request(logRequest, "query")
-                response = jsonify(Books=[book.serialize for book in books])
+                response = jsonify(
+                    Books=[book.serializeQueryById for book in books])
                 response.status_code = 200
                 return response
 
@@ -73,7 +74,7 @@ class Query(Resource):
                     "topic": request_data["topic"], "timestamp": time.time()}
                 log_request(logRequest, "query")
                 response = jsonify(
-                    Books=[book.partialSerialize for book in books])
+                    items=[book.serializeQueryByTopic for book in books])
                 response.status_code = 200
                 return response
         else:

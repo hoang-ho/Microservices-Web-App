@@ -27,21 +27,16 @@ class Book(Base):
     cost = Column(Float)
 
     @property
-    def serialize(self):
+    def serializeQueryByTopic(self):
         return {
-            "id": self.id,
-            "title": self.title,
-            "topic": self.topic,
-            "stock": self.stock,
-            "cost": self.cost,
+            self.title:self.id,
         } 
 
     @property
-    def partialSerialize(self):
+    def serializeQueryById(self):
         return {
-            "id": self.id,
-            "title": self.title,
-            "topic": self.topic,
+            "stock": self.stock,
+            "cost": self.cost,
         }
 
 # creates a create_engine instance at the bottom of the file
