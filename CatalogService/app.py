@@ -42,11 +42,13 @@ def prepopulate():
                 title=book["title"], topic=book["topic"], stock=book["stock"], cost=book["cost"]))
         session.commit()
 
-        # update
-        for book in data["buy"]:
-            session.query(Book).filter_by(
-                id=book["id"]).update({"stock": book["stock"]})
-        session.commit()
+        # update according to timestamp
+        if (data["update"]):
+            update = sorted(data["update"], key=lambda k: k["timestamp"])
+            for book in update:
+                session.query(Book).filter_by(
+                    id=book["id"]).update({"stock": book["stock"], "cost": book["cost"]})
+            session.commit()
 
 
 class Query(Resource):
@@ -54,18 +56,19 @@ class Query(Resource):
         books = []
         request_data = request.get_json()
         app.logger.info("Receive a query request ")
-        if (request_data):
-
+        if (request_data and ("id" in request_data or "topic" in request_data)):
             if ("id" in request_data):
                 books = session.query(Book).filter_by(
                     id=request_data["id"]).all()
-                logRequest = {
-                    "id": request_data["id"], "timestamp": time.time()}
-                log_request(logRequest, "query")
-                response = jsonify(
-                    Books=[book.serializeQueryById for book in books])
-                response.status_code = 200
-                return response
+                if (len(books) == 0):
+                    response = jsonify(success=False)
+                    response.status_code = 400
+                else:
+                    logRequest = {
+                        "id": request_data["id"], "timestamp": time.time()}
+                    log_request(logRequest, "query")
+                    response = jsonify(books[0].serializeQueryById)
+                    response.status_code = 200
 
             elif ("topic" in request_data):
                 books = session.query(Book).filter_by(
@@ -74,13 +77,13 @@ class Query(Resource):
                     "topic": request_data["topic"], "timestamp": time.time()}
                 log_request(logRequest, "query")
                 response = jsonify(
-                    Books=[book.serializeQueryByTopic for book in books])
+                    items={book.title: book.id for book in books})
                 response.status_code = 200
-                return response
         else:
             response = jsonify(success=False)
             response.status_code = 400
-            return response
+    
+        return response
 
 
 class Buy(Resource):
@@ -89,10 +92,41 @@ class Buy(Resource):
         data = request.get_json()
         if ("id" in data):
             book = session.query(Book).filter_by(id=data["id"]).one()
-            book.stock -= 1
+            if (book.stock > 0):
+                book.stock -= 1
+                logRequest = {"id": book.id, "stock": book.stock,
+                            "cost": book.cost, "timestamp": time.time()}
+                log_request(logRequest, "update")
+                response = jsonify(success=True)
+                response.status_code = 200
+            else:
+                response = jsonify(success=False)
+                response.status_code = 400
+        else:
+            response = jsonify(success=False)
+            response.status_code = 400
+        return response
+
+
+class Update(Resource):
+    def put(self):
+        app.logger.info("Receive an update request")
+        data = request.get_json()
+
+        if (data and "id" in data):
+            book = session.query(Book).filter_by(id=data["id"]).one()
+
+            if ("stock" in data):
+                book.stock = data["stock"]
+
+            if ("cost" in data):
+                book.cost = data["cost"]
+
             logRequest = {"id": book.id, "stock": book.stock,
-                          "timestamp": time.time()}
-            log_request(logRequest, "buy")
+                          "cost": book.cost, "timestamp": time.time()}
+
+            log_request(logRequest, "update")
+
             response = jsonify(success=True)
             response.status_code = 200
             return response
@@ -101,9 +135,9 @@ class Buy(Resource):
             response.status_code = 400
             return response
 
-
 api.add_resource(Query, "/catalog/query")
-api.add_resource(Buy, "/catalog/update")
+api.add_resource(Buy, "/catalog/buy")
+api.add_resource(Update, "/catalog/update")
 
 if __name__ == "__main__":
     # run the application

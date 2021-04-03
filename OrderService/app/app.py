@@ -49,13 +49,11 @@ class OrderService(Resource):
         response_json= response.json()
         if response.status_code!=200:
             return json.dumps({'message': "Error in receiving response from catalog service"})
-        if len(response_json['Books']) > 0:
-            quantity = response_json['Books'][0]['stock']
-        else:
-            return json.dumps({'message': "Invalid request id"})
-
+        
+        quantity = response_json['stock']
+    
         if quantity > 0:
-            response = requests.put("http://catalog-service:5002/catalog/update", json={"id": id, "amount": -1})
+            response = requests.put("http://catalog-service:5002/catalog/buy", json={"id": id})
             if response.status_code== 200:
                 return json.dumps({'message': 'Buy request successful'})
             else:

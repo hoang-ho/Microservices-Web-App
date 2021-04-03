@@ -52,35 +52,19 @@ $ docker-compose up --build <service-name>
 ```
 $ curl --request GET http://localhost:5004/search/distributed-systems
 {
-    "Books": [
-        {
-            "id": 1,
-            "title": "How to get a good grade in 677 in 20 minutes a day.",
-            "topic": "distributed systems"
-        },
-        {
-            "id": 2,
-            "title": "RPCs for Dummies.",
-            "topic": "distributed systems"
-        }
-    ]
+    "items": {
+        "How to get a good grade in 677 in 20 minutes a day.": 1,
+        "RPCs for Dummies.": 2
+    }
 }
 ```
 ```
 $ curl --request GET http://localhost:5004/search/graduate-school 
 {
-    "Books": [
-        {
-            "id": 3,
-            "title": "Xen and the Art of Surviving Graduate School.",
-            "topic": "graduate school"
-        },
-        {
-            "id": 4,
-            "title": "Cooking for the Impatient Graduate Student.",
-            "topic": "graduate school"
-        }
-    ]
+    "items": {
+        "Cooking for the Impatient Graduate Student.": 4,
+        "Xen and the Art of Surviving Graduate School.": 3
+    }
 }
 ```
 
@@ -90,15 +74,8 @@ $ curl --request GET http://localhost:5004/search/graduate-school
 ```
 $ curl --request GET http://localhost:5004/lookup/1
 {
-    "Books": [
-        {
-            "cost": 1.0,
-            "id": 1,
-            "stock": 1000,
-            "title": "How to get a good grade in 677 in 20 minutes a day.",
-            "topic": "distributed systems"
-        }
-    ]
+    "cost": 1.0,
+    "stock": 1000
 }
 ```
 
@@ -108,6 +85,15 @@ $ curl --request GET http://localhost:5004/lookup/1
 ```
 $ curl --request POST http://localhost:5004/buy/2 
 "{\"message\": \"Buy request successful\"}"
+```
+
+4. To hit the catalog service directly to update the cost or the stock of an item
+   
+```
+$ curl --header "Content-Type: application/json" --request PUT  --data '{"id": 1, "stock":2000, "cost":2000}' http://localhost:5002/catalog/update
+{
+  "success": true
+}
 ```
 
 ### Stopping and Removing the Containers

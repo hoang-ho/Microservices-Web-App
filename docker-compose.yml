@@ -4,10 +4,8 @@ services:
   catalog-service:
     container_name: catalog-service
     build: ./CatalogService
-    # comment out because we don't want to expose this service to the outside world.
-    # APIs are served using front-end-service
-    # ports:
-    # - "5002:5002"
+    ports:
+    - "5002:5002"
     # To mount a local file to container 
     # volumes:
     # - type: bind

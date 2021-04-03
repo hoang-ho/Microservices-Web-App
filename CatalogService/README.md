@@ -22,40 +22,28 @@ In terminal:
 ```
 $ curl --header "Content-Type: application/json" --request GET  --data '{"topic":"distributed systems"}' http://localhost:5002/catalog/query
 {
-    "Books": [
-        {
-            "How to get a good grade in 677 in 20 minutes a day.": 1
-        },
-        {
-            "RPCs for Dummies.": 2
-        }
-    ]
+    "items": {
+        "How to get a good grade in 677 in 20 minutes a day.": 1,
+        "RPCs for Dummies.": 2
+    }
 }
 ```
 
 ```
 $ curl --header "Content-Type: application/json" --request GET  --data '{"title":"graduate school"}' http://localhost:5002/catalog/query
 {
-    "Books": [
-        {
-            "Xen and the Art of Surviving Graduate School.": 3
-        },
-        {
-            "Cooking for the Impatient Graduate Student.": 4
-        }
-    ]
+    "items": {
+        "Cooking for the Impatient Graduate Student.": 4,
+        "Xen and the Art of Surviving Graduate School.": 3
+    }
 }
 ```
 
 ```
 $ curl --header "Content-Type: application/json" --request GET  --data '{"id": 1}' http://localhost:5002/catalog/query
 {
-    "items": [
-        {
-            "cost": 1.0,
-            "stock": 1000
-        }
-    ]
+    "cost": 1.0,
+    "stock": 1000
 }
 ```
 
@@ -66,35 +54,40 @@ In python
 >>> r = requests.get("http://localhost:5002/catalog/query", json={"topic":"distributed systems"}) 
 >>> r.text
 '{
-    "Books": [
-        {
-            "Xen and the Art of Surviving Graduate School.": 3
-        },
-        {
-            "Cooking for the Impatient Graduate Student.": 4
-        }
-    ]
+    "items": {
+        "How to get a good grade in 677 in 20 minutes a day.": 1,
+        "RPCs for Dummies.": 2
+    }
 }'
 >>> r = requests.get("http://localhost:5002/catalog/query", json={"id": 1}) 
 >>> r.text
 '{
-    "Books": [
-        {
-            "cost": 1.0,
-            "stock": 1000
-        }
-    ]
+    "cost": 1.0,
+    "stock": 1000
 }'
 ```
 
-**Update request**:
+**Buy request**:
 
 Here, I assume that we use the book id above to buy. However, we can discuss about this!
 
 In terminal, 
 
 ```
-$ curl --header "Content-Type: application/json" --request PUT  --data '{"id": 1}' http://localhost:5002/catalog/update
+$ curl --header "Content-Type: application/json" --request PUT  --data '{"id": 1}' http://localhost:5002/catalog/buy
+{
+  "success": true
+}
+```
+
+**Update request**
+
+To directly hit the catalog service to update the stock or the cost of an item:
+
+In terminal:
+
+```
+$ curl --header "Content-Type: application/json" --request PUT  --data '{"id": 1, "stock":2000, "cost":2000}' http://localhost:5002/catalog/update
 {
   "success": true
 }
