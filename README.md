@@ -84,7 +84,9 @@ $ curl --request GET http://localhost:5004/lookup/1
 
 ```
 $ curl --request POST http://localhost:5004/buy/2 
-"{\"message\": \"Buy request successful\"}"
+{
+    "message": "book bought successful"
+}
 ```
 
 4. To hit the catalog service directly to update the cost or the stock of an item
