@@ -1,8 +1,22 @@
 from flask_restful import Resource
+from sys import stdout
 
+import logging
 import requests
+import time
+
+# Define logging
+logger = logging.getLogger('front-end-service')
+
+logger.setLevel(logging.INFO) # set logger level
+logFormatter = logging.Formatter\
+("%(name)-12s %(asctime)s %(levelname)-8s %(filename)s:%(funcName)s %(message)s")
+consoleHandler = logging.StreamHandler(stdout) #set streamhandler to stdout
+consoleHandler.setFormatter(logFormatter)
+logger.addHandler(consoleHandler)
 
 class Search(Resource):
+    t_start = time.time()
     def get(self, topic_name=None):
         if not topic_name:
             return {
@@ -16,17 +30,24 @@ class Search(Resource):
         elif(topic_name == 'graduate-school'):
            data = {"topic": "graduate school"}
         else:
+            t_end = time.time()
+            logger.info(f'execution time for search: {t_end-self.t_start}')
             return {"message": "topic name should be in [distributed-systems, graduate-school]"}, 400     
         
         try:
             response = requests.get('http://catalog-service:5002/catalog/query', json=data)
             if response.status_code == 200:
+                t_end = time.time()
+                logger.info(f'execution time for search: {t_end-self.t_start}')
                 return response.json()
         except:
+            t_end = time.time()
+            logger.info(f'execution time for search: {t_end-self.t_start}')
             return {'message': 'something went wrong. Please try again'}, 500
 
 
 class LookUp(Resource):
+    t_start = time.time()
     def get(self, item_id=None):
         if not item_id:
             return {
@@ -37,6 +58,8 @@ class LookUp(Resource):
 
         id = int(item_id)
         if(id > 4 or id < 1):
+            t_end = time.time()
+            logger.info(f'execution time for lookup: {t_end-self.t_start}')
             return {"message": "Please enter a correct id"}, 400  
 
         data = {"id": id}
@@ -44,12 +67,17 @@ class LookUp(Resource):
         try:
             response = requests.get('http://catalog-service:5002/catalog/query', json=data)
             if response.status_code == 200:
+                t_end = time.time()
+                logger.info(f'execution time for lookup: {t_end-self.t_start}')
                 return response.json()
         except:
+            t_end = time.time()
+            logger.info(f'execution time for lookup: {t_end-self.t_start}')
             return {'message': 'something went wrong. Please try again'}, 500
         
 
 class Buy(Resource):
+    t_start = time.time()
     def post(self, item_id=None):
         if not item_id:
             return {
@@ -60,6 +88,8 @@ class Buy(Resource):
 
         id = int(item_id)
         if(id > 4 or id < 1):
+            t_end = time.time()
+            logger.info(f'execution time for buy: {t_end-self.t_start}')
             return {"message": "Please enter a correct id"}, 400  
 
         data = {"id": id}
@@ -67,6 +97,10 @@ class Buy(Resource):
         try:
             response = requests.put('http://order-service:5007/order', json=data)
             if response.status_code == 200:
+                t_end = time.time()
+                logger.info(f'execution time for buy: {t_end-self.t_start}')
                 return {'message': 'book bought successful'}
         except:
+            t_end = time.time()
+            logger.info(f'execution time for buy: {t_end-self.t_start}')
             return {'message': 'something went wrong. Please try again'}, 500
