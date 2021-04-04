@@ -2,8 +2,10 @@ from flask_restful import Resource
 from sys import stdout
 
 import logging
+import os
 import requests
 import time
+
 
 # Define logging
 logger = logging.getLogger('front-end-service')
@@ -14,6 +16,13 @@ logFormatter = logging.Formatter\
 consoleHandler = logging.StreamHandler(stdout) #set streamhandler to stdout
 consoleHandler.setFormatter(logFormatter)
 logger.addHandler(consoleHandler)
+
+# Import config variables
+CATALOG_HOST = os.getenv('CATALOG_HOST')
+CATALOG_PORT = os.getenv('CATALOG_PORT')
+ORDER_HOST = os.getenv('ORDER_HOST')
+ORDER_PORT = os.getenv('ORDER_PORT')
+
 
 class Search(Resource):
     t_start = time.time()
@@ -35,7 +44,8 @@ class Search(Resource):
             return {"message": "topic name should be in [distributed-systems, graduate-school]"}, 400     
         
         try:
-            response = requests.get('http://catalog-service:5002/catalog/query', json=data)
+            logger.info("catalog host: ", CATALOG_HOST)
+            response = requests.get(f'http://{CATALOG_HOST}:{CATALOG_PORT}/catalog/query', json=data)
             if response.status_code == 200:
                 t_end = time.time()
                 logger.info(f'execution time for search: {t_end-self.t_start}')
@@ -65,7 +75,7 @@ class LookUp(Resource):
         data = {"id": id}
 
         try:
-            response = requests.get('http://catalog-service:5002/catalog/query', json=data)
+            response = requests.get(f'http://{CATALOG_HOST}:{CATALOG_PORT}/catalog/query', json=data)
             if response.status_code == 200:
                 t_end = time.time()
                 logger.info(f'execution time for lookup: {t_end-self.t_start}')
@@ -95,7 +105,7 @@ class Buy(Resource):
         data = {"id": id}
 
         try:
-            response = requests.put('http://order-service:5007/order', json=data)
+            response = requests.put(f'http://{ORDER_HOST}:{ORDER_PORT}/order', json=data)
             if response.status_code == 200:
                 t_end = time.time()
                 logger.info(f'execution time for buy: {t_end-self.t_start}')

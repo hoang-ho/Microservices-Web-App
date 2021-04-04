@@ -8,6 +8,13 @@ app = Flask(__name__)
 api = Api(app)
 import sqlite3 as sql
 from datetime import datetime
+import os
+
+
+# Import config variables
+CATALOG_HOST = os.getenv('CATALOG_HOST')
+CATALOG_PORT = os.getenv('CATALOG_PORT')
+
 
 @app.before_first_request
 def init_database():
@@ -45,7 +52,7 @@ class OrderService(Resource):
              time_stamp = str(datetime.now())
              cur.execute("INSERT INTO buy_logs (request_id,timestamp) VALUES( ?, ?)",  (id,time_stamp ))
              conn.commit()
-        response = requests.get("http://catalog-service:5002/catalog/query", json={"id": id})
+        response = requests.get(f"http://{CATALOG_HOST}:{CATALOG_PORT}/catalog/query", json={"id": id})
         response_json= response.json()
         if response.status_code!=200:
             return json.dumps({'message': "Error in receiving response from catalog service"})
@@ -53,21 +60,16 @@ class OrderService(Resource):
         quantity = response_json['stock']
     
         if quantity > 0:
-            response = requests.put("http://catalog-service:5002/catalog/buy", json={"id": id})
+            response = requests.put(f"http://{CATALOG_HOST}:{CATALOG_PORT}/catalog/buy", json={"id": id})
             if response.status_code== 200:
                 return json.dumps({'message': 'Buy request successful'})
             else:
                 return json.dumps({'message': 'Buy request falied'})
-
-        #     # print(r)
-        # # r = requests.get('http://www.google.com')
         else:
             return json.dumps({'message': 'Item not available'})
 
 
         return json.dumps({'message': 'Error while buying'})
-
-        #return request_data
 
 api.add_resource(OrderService, "/order")
 api.add_resource(LogService, "/log")

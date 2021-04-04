@@ -21,6 +21,7 @@ services:
     # APIs are served using front-end-service
     #ports:
     #- "5007:5007"
+    env_file: config_env
 
   front-end-service:
     container_name: front-end-service
@@ -29,3 +30,4 @@ services:
       dockerfile: deployments/Dockerfile
     ports:
       - "5004:5004"
+    env_file: config_env
