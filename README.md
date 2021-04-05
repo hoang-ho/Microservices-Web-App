@@ -3,7 +3,8 @@ Programming Lab2 for the course CS 677: Distributed OS. In this lab we have to i
 
 # To deploy to EC2
 
-Create 3 EC2 instances using ami-061bda79b8ea8bbe2 (this is a customized image with docker, docker-composed and git installed). 
+Create 3 EC2 instances using ami-061bda79b8ea8bbe2 (this is a customized image with docker, docker-composed and git installed and security group and networks set up).
+> Note: If you want to use your own ami, you need to set up docker, git and security group beforehand
 
 ```
 $ aws ec2 run-instances --image-id ami-061bda79b8ea8bbe2 --instance-type t2.micro --key-name 677kp

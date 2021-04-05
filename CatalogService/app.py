@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from database_setup import Base, Book
+import threading
 import json
 import time
 
@@ -11,12 +12,24 @@ app = Flask(__name__)
 api = Api(app)
 
 # Connect to Database and create database session
-engine = create_engine('sqlite:///books-collection.db', echo=True)
+engine = create_engine('sqlite:///books-collection.db',
+                       echo=True, connect_args={'check_same_thread': False})
 
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+
+def synchronized(func):
+
+    func.__lock__ = threading.Lock()
+
+    def synced_func(*args, **kws):
+        with func.__lock__:
+            return func(*args, **kws)
+
+    return synced_func
 
 
 def log_request(newData, key):
@@ -27,6 +40,26 @@ def log_request(newData, key):
     json.dump(data, fd)
     fd.truncate()
     fd.close()
+
+
+@synchronized
+def update_data(json_request):
+    book = session.query(Book).filter_by(id=json_request["id"]).one()
+
+    if ("stock" in json_request):
+        book.stock = json_request["stock"]
+
+    if ("cost" in json_request):
+        book.cost = json_request["cost"]
+
+    if (json_request["buy"]):
+        book.stock -= 1
+
+    logRequest = {"id": book.id, "stock": book.stock,
+                  "cost": book.cost, "timestamp": time.time()}
+    log_request(logRequest, "update")
+
+    return book.title
 
 
 @app.before_first_request
@@ -49,8 +82,6 @@ def prepopulate():
                 session.query(Book).filter_by(
                     id=book["id"]).update({"stock": book["stock"], "cost": book["cost"]})
             session.commit()
-
-
 class Query(Resource):
     def get(self):
         books = []
@@ -58,8 +89,7 @@ class Query(Resource):
         app.logger.info("Receive a query request ")
         if (request_data and ("id" in request_data or "topic" in request_data)):
             if ("id" in request_data):
-                books = session.query(Book).filter_by(
-                    id=request_data["id"]).all()
+                books = session.query(Book).filter_by(id=request_data["id"]).all()
                 if (len(books) == 0):
                     response = jsonify(success=False)
                     response.status_code = 400
@@ -82,26 +112,19 @@ class Query(Resource):
         else:
             response = jsonify(success=False)
             response.status_code = 400
-    
+
         return response
 
 
 class Buy(Resource):
     def put(self):
         app.logger.info("Receive a buy request")
-        data = request.get_json()
-        if ("id" in data):
-            book = session.query(Book).filter_by(id=data["id"]).one()
-            if (book.stock > 0):
-                book.stock -= 1
-                logRequest = {"id": book.id, "stock": book.stock,
-                            "cost": book.cost, "timestamp": time.time()}
-                log_request(logRequest, "update")
-                response = jsonify(success=True)
-                response.status_code = 200
-            else:
-                response = jsonify(success=False)
-                response.status_code = 400
+        json_request = request.get_json()
+        if ("id" in json_request):
+            title = update_data(json_request)
+            app.logger.info("Update data for book " + title)
+            response = jsonify(book=title)
+            response.status_code = 200
         else:
             response = jsonify(success=False)
             response.status_code = 400
@@ -111,23 +134,13 @@ class Buy(Resource):
 class Update(Resource):
     def put(self):
         app.logger.info("Receive an update request")
-        data = request.get_json()
+        json_request = request.get_json()
 
-        if (data and "id" in data):
-            book = session.query(Book).filter_by(id=data["id"]).one()
-
-            if ("stock" in data):
-                book.stock = data["stock"]
-
-            if ("cost" in data):
-                book.cost = data["cost"]
-
-            logRequest = {"id": book.id, "stock": book.stock,
-                          "cost": book.cost, "timestamp": time.time()}
-
-            log_request(logRequest, "update")
-
-            response = jsonify(success=True)
+        if (json_request and "id" in json_request):
+            json_request["buy"] = False
+            title = update_data(json_request)
+            app.logger.info("Update data for book " + title)
+            response = jsonify(book=title)
             response.status_code = 200
             return response
         else:
