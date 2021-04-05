@@ -17,6 +17,7 @@ services:
     build: 
       context: ./OrderService
       dockerfile: deployments/Dockerfile
+    ports:
     - "5007:5007"
     env_file: config_env
 
