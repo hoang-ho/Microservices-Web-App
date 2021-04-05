@@ -5,7 +5,7 @@ services:
     container_name: catalog-service
     build: ./CatalogService
     ports:
-      - "5002:5002"
+      - "8080:5002"
     # To mount a local file to container 
     # volumes:
     # - type: bind
@@ -18,7 +18,7 @@ services:
       context: ./OrderService
       dockerfile: deployments/Dockerfile
     ports:
-      - "5007:5007"
+      - "8080:5007"
     env_file: config_env
 
   front-end-service:
@@ -27,5 +27,5 @@ services:
       context: ./FrontendService
       dockerfile: deployments/Dockerfile
     ports:
-      - "5004:5004"
+      - "8080:5004"
     env_file: config_env
