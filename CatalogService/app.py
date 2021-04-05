@@ -121,6 +121,7 @@ class Buy(Resource):
         app.logger.info("Receive a buy request")
         json_request = request.get_json()
         if ("id" in json_request):
+            json_request["buy"] = True
             title = update_data(json_request)
             app.logger.info("Update data for book " + title)
             response = jsonify(book=title)
