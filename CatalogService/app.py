@@ -141,11 +141,13 @@ class Update(Resource):
             json_request["buy"] = False
             title = update_data(json_request)
             app.logger.info("Update data for book " + title)
-            response = jsonify(book=title)
+            json_response = {"message": "Done update", "book": title}
+            response = jsonify(json_response)
             response.status_code = 200
             return response
         else:
-            response = jsonify(success=False)
+            json_response = {"message": "Update not successful"}
+            response = jsonify(json_response)
             response.status_code = 400
             return response
 
