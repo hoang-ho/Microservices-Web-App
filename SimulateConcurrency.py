@@ -1,3 +1,4 @@
+import argparse
 import requests
 import logging
 import threading
@@ -6,28 +7,50 @@ import random
 logging.getLogger().setLevel(logging.INFO)
 
 
-def main():
-    api = ["http://localhost:5004/buy/2",
-           "http://localhost:5002/catalog/update"]
+def main(frontend, catalog):
+    # api = ["http://ec2-3-84-157-29.compute-1.amazonaws.com:5004/buy/2",
+    #        "http://ec2-54-164-223-101.compute-1.amazonaws.com:5002/catalog/update"]
+    frontend_buy = "http://" + frontend + ":5004/buy/2"
+    catalog_update = "http://" + catalog + ":5002/catalog/update"
+
+    api = [frontend_buy, catalog_update]
 
     data = {"id": 2, "stock": 2000, "cost": 2000}
 
     call = random.choice(api)
-    logging.info("Calling request %s ", call)
+    logging.info("Calling request %s at timestamp %s", call, time.time())
     if (call == api[1]):
-        response = requests.put(
-            "http://localhost:5002/catalog/update", json=data)
+        logging.info("Calling request %s at timestamp %s", call, time.time())
+        response = requests.put(call, json=data)
     else:
-        response = requests.post("http://localhost:5004/buy/2")
+        response = requests.post(call)
 
-    logging.info("Response: %s ", response.text)
+    logging.info("Response: %s at time stamp %s", response.text, time.time())
 
 
 if __name__ == "__main__":
+    
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--front-end-dns", required=True)
+    parser.add_argument("--catalog-dns", required=True)
+    args = parser.parse_args()
+    
+    frontend = args.front_end_dns
+    catalog = args.catalog_dns
+    
+    # response = requests.get(
+    #     "http://ec2-3-84-157-29.compute-1.amazonaws.com:5004/lookup/2")
+
+    response = requests.get("http://" + frontend + ":5004/lookup/2")
+
+    logging.info(
+        "Look up the book stock and cost after update and buy: %s ", response.text)
+
     threads = list()
     for index in range(3):
         logging.info("Main    : create and start thread %d.", index)
-        x = threading.Thread(target=main)
+        x = threading.Thread(target=main, args=(frontend, catalog))
         threads.append(x)
         x.start()
 
@@ -35,3 +58,8 @@ if __name__ == "__main__":
         logging.info("Main    : before joining thread %d.", index)
         thread.join()
         logging.info("Main    : thread %d done", index)
+
+    response = requests.get("http://" + frontend + ":5004/lookup/2")
+
+    logging.info(
+        "Look up the book stock and cost after update and buy: %s ", response.text)

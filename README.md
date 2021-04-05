@@ -1,13 +1,13 @@
 # Multi-tier Microservices WebApp
 Programming Lab2 for the course CS 677: Distributed OS. In this lab we have to implement a microservices architecture using REST APIs.
 
-# To deploy to EC2
+## To deploy to EC2
 
 Create 3 EC2 instances using ami-061bda79b8ea8bbe2 (this is a customized image with docker, docker-composed and git installed and security group and networks set up).
 > Note: If you want to use your own ami, you need to set up docker, git and security group beforehand
 
 ```
-$ aws ec2 run-instances --image-id ami-061bda79b8ea8bbe2 --instance-type t2.micro --key-name 677kp
+$ s 
 $ aws ec2 describe-instances --instance-id $INSTANCE_ID
 ```
 
@@ -25,6 +25,7 @@ $ cd Microservices-Web-App
 ```
 
 For the instance you choose to server the catalog-service, put its Private IPv4 address to the config_env, similarly for order-service. You repeat this step for EC2 instances that you choose to server front-end-service and the order-service.
+> Note: If you want to change the port, please use ports from range 5000 - 6000 because the security group is set up for port in that range. Remember to update the config_env accordingly!
 
 ```
 # Modify the config_env
@@ -144,6 +145,55 @@ curl: (7) Failed to connect to ec2-100-27-24-110.compute-1.amazonaws.com port 50
     "stock": 999
 }
 ```
+
+## Simulate Concurrency
+
+To simulate a concurrency situation with buy and update, run the SimulateConcurrency.py. Example Output:
+
+```
+(base) Hoangs-MacBook-Pro:Microservices-Web-App hoangho$ python3 SimulateConcurrency.py --front-end-dns ec2-3-84-157-29.compute-1.amazonaws.com --catalog-dns ec2-54-164-223-101.compute-1.amazonaws.com
+INFO:root:Look up the book stock and cost after update and buy: {
+    "cost": 10.0,
+    "stock": 1000
+}
+ 
+INFO:root:Main    : create and start thread 0.
+INFO:root:Calling request http://ec2-54-164-223-101.compute-1.amazonaws.com:5002/catalog/update at timestamp 1617647399.7801511
+INFO:root:Calling request http://ec2-54-164-223-101.compute-1.amazonaws.com:5002/catalog/update at timestamp 1617647399.7802508
+INFO:root:Main    : create and start thread 1.
+INFO:root:Calling request http://ec2-3-84-157-29.compute-1.amazonaws.com:5004/buy/2 at timestamp 1617647399.7807848
+INFO:root:Main    : create and start thread 2.
+INFO:root:Calling request http://ec2-54-164-223-101.compute-1.amazonaws.com:5002/catalog/update at timestamp 1617647399.781227
+INFO:root:Main    : before joining thread 0.
+INFO:root:Calling request http://ec2-54-164-223-101.compute-1.amazonaws.com:5002/catalog/update at timestamp 1617647399.7819872
+INFO:root:Response: {
+  "book": "RPCs for Dummies.", 
+  "message": "Done update"
+}
+ at time stamp 1617647399.89176
+INFO:root:Main    : thread 0 done
+INFO:root:Main    : before joining thread 1.
+INFO:root:Response: {
+  "book": "RPCs for Dummies.", 
+  "message": "Done update"
+}
+ at time stamp 1617647399.896009
+INFO:root:Response: {
+    "message": "book bought successful"
+}
+ at time stamp 1617647399.9221802
+INFO:root:Main    : thread 1 done
+INFO:root:Main    : before joining thread 2.
+INFO:root:Main    : thread 2 done
+INFO:root:Look up the book stock and cost after update and buy: {
+    "cost": 2000.0,
+    "stock": 1999
+}
+```
+
+TODO: Please update the response for buy request and update the example output for SimulateConcurrency.py 
+
+As we can see from the terminal log, we have 2 update requests and 1 buy requests. The two update requests are done first, and thus, the stock for book 2 is set to 2000.0 and its cost is set to 2000.0. When the buy request comes in, the stock is set to 1999 and the cost remains the same!
 
 ## Milestone 1
 
