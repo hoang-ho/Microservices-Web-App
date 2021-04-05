@@ -8,9 +8,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 def main(frontend):
-    frontend_search = "http://" + frontend + ":5004/search/distributed-systems"
     response = requests.get("http://" + frontend + ":5004/search/distributed-systems")
-    logging.info("Response at time stamp ")
 
 
 if __name__ == "__main__":
@@ -27,11 +25,12 @@ if __name__ == "__main__":
     t_avg = 0
 
     while(i < 1000):
+        logging.info(f'iteration: {i}')
         t_start = list()
         threads = list()
         for index in range(5):
 
-            x = threading.Thread(target=main, args=(frontend))
+            x = threading.Thread(target=main, args=(frontend,))
             threads.append(x)
             t_start.append(time.time())
             x.start()
