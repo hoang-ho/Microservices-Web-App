@@ -9,9 +9,9 @@ api = Api(app)
 # route registration
 api.add_resource(UserList, '/')
 
-api.add_resource(Search, '/search', '/search/<topic_name>')
-api.add_resource(LookUp, '/lookup', '/lookup/<item_id>')
-api.add_resource(Buy, '/buy/<item_id>')
+api.add_resource(Search, '/search', '/search/<topic_name>', strict_slashes=False)
+api.add_resource(LookUp, '/lookup', '/lookup/<item_id>', strict_slashes=False)
+api.add_resource(Buy, '/buy/<item_id>', strict_slashes=False)
 
 
 if __name__ == '__main__':

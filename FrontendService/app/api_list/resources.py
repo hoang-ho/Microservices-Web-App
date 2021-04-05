@@ -17,6 +17,7 @@ consoleHandler = logging.StreamHandler(stdout) #set streamhandler to stdout
 consoleHandler.setFormatter(logFormatter)
 logger.addHandler(consoleHandler)
 
+
 # Import config variables
 CATALOG_HOST = os.getenv('CATALOG_HOST')
 CATALOG_PORT = os.getenv('CATALOG_PORT')
@@ -29,8 +30,8 @@ class Search(Resource):
     def get(self, topic_name=None):
         if not topic_name:
             return {
-                'Operation': 'URL',
-                'GET': '<address>:<port>/search/<topic_name>',
+                'Operation': 'GET',
+                'URL': '<address>:<port>/search/<topic_name>',
                 'topic_name': 'a string of the value distributed-systems or graduate-school'
             }
 
@@ -61,8 +62,8 @@ class LookUp(Resource):
     def get(self, item_id=None):
         if not item_id:
             return {
-                'Operation': 'URL',
-                'GET': '<address>:<port>/lookup/<item_id>',
+                'Operation': 'GET',
+                'URL': '<address>:<port>/lookup/<item_id>',
                 'item_id': 'string that specifies the book id. It accepts value from 1 to 4'
             }
 
@@ -91,8 +92,8 @@ class Buy(Resource):
     def post(self, item_id=None):
         if not item_id:
             return {
-                'Operation': 'URL',
-                'POST': '<address>:<port>/buy/<item_id>',
+                'Operation': 'POST',
+                'URL': '<address>:<port>/buy/<item_id>',
                 'topic_name': 'string that specifies the book id. It accepts value from 1 to 4'
             }
 
@@ -109,7 +110,11 @@ class Buy(Resource):
             if response.status_code == 200:
                 t_end = time.time()
                 logger.info(f'execution time for buy: {t_end-self.t_start}')
-                return {'message': 'book bought successful'}
+                response_json = response.json()
+                book = response_json.get('book', '')
+                if(book):
+                    return {'message': f'successfully purchased the book {book}'}
+                return response.json()
         except:
             t_end = time.time()
             logger.info(f'execution time for buy: {t_end-self.t_start}')

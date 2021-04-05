@@ -54,21 +54,21 @@ class OrderService(Resource):
              cur.execute("INSERT INTO buy_logs (request_id,timestamp) VALUES( ?, ?)",  (id,time_stamp ))
              conn.commit()
         response = requests.get(f"http://{CATALOG_HOST}:{CATALOG_PORT}/catalog/query", json={"id": id})
-        response_json= response.json()
+        response_json = response.json()
         if response.status_code!=200:
-            return json.dumps({'message': "Error in receiving response from catalog service"})
+            return {'message': "Error in receiving response from catalog service"}, 500
         
         quantity = response_json['stock']
         if quantity > 0:
             response = requests.put(f"http://{CATALOG_HOST}:{CATALOG_PORT}/catalog/buy", json={"id": id})
-            if response.status_code== 200:
-                return json.dumps({'message': 'Buy request successful'})
+            if response.status_code == 200:
+                return response.json(), 200
             else:
-                return json.dumps({'message': 'Buy request falied'})
+                return {'message': 'Buy request falied'}, 500
         else:
-            return json.dumps({'message': 'Item not available'})
+            return {'message': 'Item not available'}, 200
 
-        return json.dumps({'message': 'Error while buying'})
+        return {'message': 'Error while buying'}, 500
 
 api.add_resource(OrderService, "/order")
 api.add_resource(LogService, "/log")
