@@ -45,7 +45,7 @@ if __name__ == "__main__":
     response = requests.get("http://" + frontend + ":5004/lookup/2")
 
     logging.info(
-        "Look up the book stock and cost after update and buy: %s ", response.text)
+        "Look up the book stock and cost before update and buy: %s ", response.text)
 
     threads = list()
     for index in range(3):

@@ -152,7 +152,7 @@ To simulate a concurrency situation with buy and update, run the SimulateConcurr
 
 ```
 (base) Hoangs-MacBook-Pro:Microservices-Web-App hoangho$ python3 SimulateConcurrency.py --front-end-dns ec2-3-84-157-29.compute-1.amazonaws.com --catalog-dns ec2-54-164-223-101.compute-1.amazonaws.com
-INFO:root:Look up the book stock and cost after update and buy: {
+INFO:root:Look up the book stock and cost before update and buy: {
     "cost": 10.0,
     "stock": 1000
 }
