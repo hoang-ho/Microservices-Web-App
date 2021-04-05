@@ -9,6 +9,7 @@ api = Api(app)
 import sqlite3 as sql
 from datetime import datetime
 import os
+import threading
 
 
 # Import config variables
@@ -58,7 +59,6 @@ class OrderService(Resource):
             return json.dumps({'message': "Error in receiving response from catalog service"})
         
         quantity = response_json['stock']
-    
         if quantity > 0:
             response = requests.put(f"http://{CATALOG_HOST}:{CATALOG_PORT}/catalog/buy", json={"id": id})
             if response.status_code== 200:
@@ -68,7 +68,6 @@ class OrderService(Resource):
         else:
             return json.dumps({'message': 'Item not available'})
 
-
         return json.dumps({'message': 'Error while buying'})
 
 api.add_resource(OrderService, "/order")
@@ -76,5 +75,5 @@ api.add_resource(LogService, "/log")
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0',  port=5007)
+    app.run(debug=True, host='0.0.0.0',threaded=True ,port=5007)
 
