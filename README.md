@@ -1,6 +1,149 @@
 # Multi-tier Microservices WebApp
 Programming Lab2 for the course CS 677: Distributed OS. In this lab we have to implement a microservices architecture using REST APIs.
 
+# To deploy to EC2
+
+Create 3 EC2 instances using ami-061bda79b8ea8bbe2 (this is a customized image with docker, docker-composed and git installed). 
+
+```
+$ aws ec2 run-instances --image-id ami-061bda79b8ea8bbe2 --instance-type t2.micro --key-name 677kp
+$ aws ec2 describe-instances --instance-id $INSTANCE_ID
+```
+
+From the last command, save down the Public IPv4 DNS and the Private IPv4 addresses for each instance. Next, ssh into the instance
+
+```
+$ ssh -i "677kp.pem" ec2-user@$PUBLIC_IPv4_DNS
+```
+
+Clone the repo inside the instance
+
+```
+$ git clone https://github.com/hoang-ho/Microservices-Web-App.git
+$ cd Microservices-Web-App
+```
+
+For the instance you choose to server the catalog-service, put its Private IPv4 address to the config_env, similarly for order-service. You repeat this step for EC2 instances that you choose to server front-end-service and the order-service.
+
+```
+# Modify the config_env
+$ vim config_env
+```
+
+Now we're done setting up and will start deploying:
+
+In the instance you choose to be front-end-service
+
+```
+$ docker-compose up --build front-end-service
+```
+
+In the instance you choose to be catalog-service
+
+```
+$ docker-compose up --build catalog-service
+```
+
+In the instance you choose to be order-service
+
+```
+$ docker-compose up --build order-service
+```
+
+From your local machine, to test the API
+
+```
+$ curl --request GET $FRONT_END_PUBLIC_IPv4_DNS:5004/search/graduate-school
+
+{
+    "items": {
+        "Cooking for the Impatient Graduate Student.": 4,
+        "Xen and the Art of Surviving Graduate School.": 3
+    }
+}
+```
+
+```
+$ curl --request GET $FRONT_END_PUBLIC_IPv4_DNS:5004/search/distributed-systems
+
+{
+    "items": {
+        "How to get a good grade in 677 in 20 minutes a day.": 1,
+        "RPCs for Dummies.": 2
+    }
+}
+```
+
+```
+$ curl --request POST $FRONT_END_PUBLIC_IPv4_DNS:5004/buy/2
+
+{
+    "message": "book bought successful"
+}
+```
+
+```
+$ curl --request GET $FRONT_END_PUBLIC_IPv4_DNS:5004/lookup/2
+
+{
+    "cost": 10.0,
+    "stock": 999
+}
+```
+
+Example output:
+
+```
+(base) Hoangs-MacBook-Pro:~ hoangho$ curl --request GET ec2-107-22-145-248.compute-1.amazonaws.com:5004/search/distributed-systems
+{
+    "items": {
+        "How to get a good grade in 677 in 20 minutes a day.": 1,
+        "RPCs for Dummies.": 2
+    }
+}
+(base) Hoangs-MacBook-Pro:~ hoangho$ curl --request GET ec2-107-22-145-248.compute-1.amazonaws.com:5004/search/graduate-school
+{
+    "items": {
+        "Cooking for the Impatient Graduate Student.": 4,
+        "Xen and the Art of Surviving Graduate School.": 3
+    }
+}
+(base) Hoangs-MacBook-Pro:~ hoangho$ curl --request POST ec2-107-22-145-248.compute-1.amazonaws.com:5004/buy/2
+{
+    "message": "something went wrong. Please try again"
+}
+(base) Hoangs-MacBook-Pro:~ hoangho$ curl --header "Content-Type: application/json" --request PUT --data '{"id": 2}' ec2-100-27-24-110.compute-1.amazonaws.com:5007/order
+curl: (7) Failed to connect to ec2-100-27-24-110.compute-1.amazonaws.com port 5007: Connection refused
+(base) Hoangs-MacBook-Pro:~ hoangho$ 
+(base) Hoangs-MacBook-Pro:~ hoangho$ curl --request GET ec2-107-22-145-248.compute-1.amazonaws.com:5004/search/graduate-school
+{
+    "items": {
+        "Cooking for the Impatient Graduate Student.": 4,
+        "Xen and the Art of Surviving Graduate School.": 3
+    }
+}
+(base) Hoangs-MacBook-Pro:~ hoangho$ curl --request GET ec2-107-22-145-248.compute-1.amazonaws.com:5004/search/distributed-systems
+{
+    "items": {
+        "How to get a good grade in 677 in 20 minutes a day.": 1,
+        "RPCs for Dummies.": 2
+    }
+}
+(base) Hoangs-MacBook-Pro:~ hoangho$ curl --request POST ec2-107-22-145-248.compute-1.amazonaws.com:5004/buy/2
+{
+    "message": "book bought successful"
+}
+(base) Hoangs-MacBook-Pro:~ hoangho$ curl --request POST ec2-107-22-145-248.compute-1.amazonaws.com:5004/lookup/2
+{
+    "message": "The method is not allowed for the requested URL."
+}
+(base) Hoangs-MacBook-Pro:~ hoangho$ curl --request GET ec2-107-22-145-248.compute-1.amazonaws.com:5004/lookup/2
+{
+    "cost": 10.0,
+    "stock": 999
+}
+```
+
 ## Milestone 1
 
 **Deliverables:** A bookstore running on a single server with a single buyer. The bookstore components (front-end, catalogue and order) are deployed as three processes and a fourth process representing the client performing interface calls to the front-end process.
