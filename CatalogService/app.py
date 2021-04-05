@@ -31,7 +31,7 @@ def synchronized(func):
 
     return synced_func
 
-
+@synchronized
 def log_request(newData, key):
     fd = open('logfile.json', "r+")
     data = json.loads(fd.read())
