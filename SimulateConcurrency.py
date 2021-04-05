@@ -8,8 +8,6 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 def main(frontend, catalog):
-    # api = ["http://ec2-3-84-157-29.compute-1.amazonaws.com:5004/buy/2",
-    #        "http://ec2-54-164-223-101.compute-1.amazonaws.com:5002/catalog/update"]
     frontend_buy = "http://" + frontend + ":5004/buy/2"
     catalog_update = "http://" + catalog + ":5002/catalog/update"
 
@@ -38,9 +36,6 @@ if __name__ == "__main__":
     
     frontend = args.front_end_dns
     catalog = args.catalog_dns
-    
-    # response = requests.get(
-    #     "http://ec2-3-84-157-29.compute-1.amazonaws.com:5004/lookup/2")
 
     response = requests.get("http://" + frontend + ":5004/lookup/2")
 
