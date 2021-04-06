@@ -1,5 +1,6 @@
 import json 
 
+# this is a helper function to construct the initial log file
 def add_data():
     data = {}
     data["add"] = [{

@@ -26,6 +26,10 @@ ORDER_PORT = os.getenv('ORDER_PORT')
 
 
 class Search(Resource):
+    '''
+    Handle search by topic request
+    '''
+
     t_start = time.time()
     def get(self, topic_name=None):
         # return the expected value
@@ -61,6 +65,10 @@ class Search(Resource):
 
 
 class LookUp(Resource):
+    '''
+    Handle look by id request
+    '''
+
     t_start = time.time()
     def get(self, item_id=None):
         # return the expected value
@@ -94,6 +102,10 @@ class LookUp(Resource):
         
 
 class Buy(Resource):
+    '''
+    Handle buy by id request
+    '''
+
     t_start = time.time()
     def post(self, item_id=None):
         # return the expected value

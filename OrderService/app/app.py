@@ -43,6 +43,9 @@ class LogService(Resource):
 class OrderService(Resource):
 
     def put(self):
+        '''
+        Handle a put request to buy a book
+        '''
         request_data = request.get_json()
         id= request_data['id']
         if not id:

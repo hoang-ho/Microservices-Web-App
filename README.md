@@ -6,12 +6,12 @@ Programming Lab2 for the course CS 677: Distributed OS. In this lab we have to i
 ## To deploy to EC2
 
 ### Creating and Running Instances
-Create 3 EC2 instances using ami-061bda79b8ea8bbe2 (this is a customized image with docker, docker-composed and git repo cloned and installed).
+Create 3 EC2 instances using ami-04a6eb17c9239f117 (this is a customized image with docker, docker-composed and git repo cloned and installed).
 
 > NOTE: If you want to use your own ami, you will need to set up docker, git and security group beforehand
 
 ```
-$ aws ec2 run-instances --image-id ami-03d8e5f5eac28e515 --instance-type t2.micro --key-name 677kp
+$ aws ec2 run-instances --image-id ami-04a6eb17c9239f117 --instance-type t2.micro --key-name 677kp
 $ aws ec2 describe-instances --instance-id $INSTANCE_ID
 ```
 
@@ -21,8 +21,8 @@ From the last command, save down the Public IPv4 DNS and the Private IPv4 addres
 
 Confirm the rules for incoming traffic as follows. In the Inbound rules section, create the following rules (choose Add rule for each new rule):
 
-- Choose HTTP from the Type list, and make sure that Source is set to Anywhere (0.0.0.0/0).
-- Choose HTTPS from the Type list, and make sure that Source is set to Anywhere (0.0.0.0/0).
+- Choose HTTP from the Type list, port 80 for port range, and make sure that Source is set to Anywhere (0.0.0.0/0).
+- Choose HTTPS from the Type list, port 443 for port range, and make sure that Source is set to Anywhere (0.0.0.0/0).
 - Choose Custom TCP from the Type list, 5000-6000 for Port Range, and make sure that Source is set to Anywhere (0.0.0.0/0).
 
 ### Setting up the Instances
@@ -90,7 +90,7 @@ $ curl --request GET $FRONT_END_PUBLIC_IPv4_DNS:5004/lookup/<book_id>
 ```
 
 ```
-curl --header "Content-Type: application/json" --request PUT  --data '{"id": 1, "stock":2000, "cost":2000}' http://${catalog}:5002/catalog/update
+curl --header "Content-Type: application/json" --request PUT  --data '{"id": 1, "stock":2000, "cost":2000}' http://$CATALOG_PUBLIC_IPv4_DNS:5002/catalog/update
 ```
 
 ### Sample Output:
@@ -190,6 +190,7 @@ INFO:root:Average time: 136.53304195404053
 ```
 
 ## Logging on Catalog and Order Services
+
 1. Catalog Service
 
     Logging happens in `logfile.json` inside the Docker container catalog-service. To check the logs run the following command while the container is running

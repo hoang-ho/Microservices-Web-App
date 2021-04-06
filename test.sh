@@ -33,3 +33,6 @@ echo "Lookup request for book id 1 " >> out.txt
 
 curl --request GET http://${frontend}:5004/lookup/1 >> out.txt 
 
+echo "Concurrent buy request " 
+
+python3 SimulateConcurrency.py --front-end-dns ${frontend} --catalog-dns ${catalog}

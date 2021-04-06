@@ -22,6 +22,9 @@ session = DBSession()
 
 
 def synchronized(func):
+    '''
+    synchronized decorator
+    '''
 
     func.__lock__ = threading.Lock()
 
@@ -33,6 +36,9 @@ def synchronized(func):
 
 @synchronized
 def log_request(newData, key):
+    '''
+    Write requests to a logfile in case the the database or the app goes down. We can reconstruct from this log file
+    '''
     fd = open('logfile.json', "r+")
     data = json.loads(fd.read())
     data[key].append(newData)
@@ -44,6 +50,10 @@ def log_request(newData, key):
 
 @synchronized
 def update_data(json_request):
+    '''
+    json_request: a request of type json that contains id to query book by id and update/buy the book
+    This is a synchronized function
+    '''
     book = session.query(Book).filter_by(id=json_request["id"]).one()
 
     if ("stock" in json_request):
@@ -84,6 +94,9 @@ def prepopulate():
             session.commit()
 class Query(Resource):
     def get(self):
+        '''
+        Handle get request for search by topic and lookup by id
+        '''
         books = []
         request_data = request.get_json()
         app.logger.info("Receive a query request ")
@@ -118,6 +131,10 @@ class Query(Resource):
 
 class Buy(Resource):
     def put(self):
+        '''
+        Handle put request for buy
+        Return 200 if buy succeeds
+        '''
         app.logger.info("Receive a buy request")
         json_request = request.get_json()
         if ("id" in json_request):
@@ -134,6 +151,10 @@ class Buy(Resource):
 
 class Update(Resource):
     def put(self):
+        '''
+        Handle put request for update
+        Return 200 if update succeeds
+        '''
         app.logger.info("Receive an update request")
         json_request = request.get_json()
 

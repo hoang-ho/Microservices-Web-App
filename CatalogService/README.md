@@ -116,3 +116,49 @@ $ cat logfile.json
 ```
 
 A buy request will be logged in the "buy" key of the json object. A query request will be logged in the "query" key of the json object. 
+
+## Concurrency
+
+To maintain concurrency in the buy and update request, I write a python decorator to synchronized concurrent write requests to the log file as well as to synchronized the access to the update_data function, which is called inside the buy and update request to access and update the database. With the synchronized decorator, it's guaranteed that only one thread can write to the log at a time and only one thread can access the database at a time.
+
+```
+def synchronized(func):
+
+    func.__lock__ = threading.Lock()
+
+    def synced_func(*args, **kws):
+        with func.__lock__:
+            return func(*args, **kws)
+
+    return synced_func
+
+@synchronized
+def log_request(newData, key):
+    fd = open('logfile.json', "r+")
+    data = json.loads(fd.read())
+    data[key].append(newData)
+    fd.seek(0)
+    json.dump(data, fd)
+    fd.truncate()
+    fd.close()
+
+
+@synchronized
+def update_data(json_request):
+    book = session.query(Book).filter_by(id=json_request["id"]).one()
+
+    if ("stock" in json_request):
+        book.stock = json_request["stock"]
+
+    if ("cost" in json_request):
+        book.cost = json_request["cost"]
+
+    if (json_request["buy"]):
+        book.stock -= 1
+
+    logRequest = {"id": book.id, "stock": book.stock,
+                  "cost": book.cost, "timestamp": time.time()}
+    log_request(logRequest, "update")
+
+    return book.title
+```
