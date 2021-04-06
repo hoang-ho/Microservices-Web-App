@@ -28,6 +28,7 @@ ORDER_PORT = os.getenv('ORDER_PORT')
 class Search(Resource):
     t_start = time.time()
     def get(self, topic_name=None):
+        # return the expected value
         if not topic_name:
             return {
                 'Operation': 'GET',
@@ -35,6 +36,7 @@ class Search(Resource):
                 'topic_name': 'a string of the value distributed-systems or graduate-school'
             }
 
+        # validation
         if(topic_name == 'distributed-systems'):
             data = {"topic": "distributed systems"}
         elif(topic_name == 'graduate-school'):
@@ -44,6 +46,7 @@ class Search(Resource):
             logger.info(f'execution time for search: {t_end-self.t_start}')
             return {"message": "topic name should be in [distributed-systems, graduate-school]"}, 400     
         
+        # requesting to catalog
         try:
             logger.info("catalog host: ", CATALOG_HOST)
             response = requests.get(f'http://{CATALOG_HOST}:{CATALOG_PORT}/catalog/query', json=data)
@@ -60,6 +63,7 @@ class Search(Resource):
 class LookUp(Resource):
     t_start = time.time()
     def get(self, item_id=None):
+        # return the expected value
         if not item_id:
             return {
                 'Operation': 'GET',
@@ -67,6 +71,7 @@ class LookUp(Resource):
                 'item_id': 'string that specifies the book id. It accepts value from 1 to 4'
             }
 
+        # validation
         id = int(item_id)
         if(id > 4 or id < 1):
             t_end = time.time()
@@ -75,6 +80,7 @@ class LookUp(Resource):
 
         data = {"id": id}
 
+        # requesting to catalog
         try:
             response = requests.get(f'http://{CATALOG_HOST}:{CATALOG_PORT}/catalog/query', json=data)
             if response.status_code == 200:
@@ -90,6 +96,7 @@ class LookUp(Resource):
 class Buy(Resource):
     t_start = time.time()
     def post(self, item_id=None):
+        # return the expected value
         if not item_id:
             return {
                 'Operation': 'POST',
@@ -97,6 +104,7 @@ class Buy(Resource):
                 'topic_name': 'string that specifies the book id. It accepts value from 1 to 4'
             }
 
+        # validation
         id = int(item_id)
         if(id > 4 or id < 1):
             t_end = time.time()
@@ -105,6 +113,7 @@ class Buy(Resource):
 
         data = {"id": id}
 
+        # requesting to order
         try:
             response = requests.put(f'http://{ORDER_HOST}:{ORDER_PORT}/order', json=data)
             if response.status_code == 200:
